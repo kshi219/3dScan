@@ -21,13 +21,13 @@ def convert_pattern(pattern_img, proj_size, offset):
             pattern = pattern_img[r,c,:]
 
             if not np.isnan(pattern[0]):
-                code = grayToBinary(np.int(pattern[0]), offset[0])
+                code = grayToBinary(np.int64(pattern[0]), offset[0])
                 if code < 0 : code = 0
                 if code >= proj_size[0]: code = proj_size[0] - 1
                 pattern_img[r, c, 0] = code
 
             if not np.isnan(pattern[1]):
-                code = grayToBinary(np.int(pattern[1]), offset[1])
+                code = grayToBinary(np.int64(pattern[1]), offset[1])
                 if code < 0: code = 0
                 if code >= proj_size[1]: code = proj_size[1] - 1
                 pattern_img[r, c, 1] = code
@@ -36,4 +36,3 @@ def convert_pattern(pattern_img, proj_size, offset):
 
 
 
-print util_grayToBinary(8,4)

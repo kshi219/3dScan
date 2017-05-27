@@ -9,8 +9,8 @@ import code_convert
 
 
 ROOT_DIR = '/home/kevin/Desktop/learningResources/3dscan/cartman/'
-DIRECT_EST_PARAM = 0.35
-THRESH_PARAM = 15
+DIRECT_EST_PARAM = 0.3
+THRESH_PARAM = 7
 PROJ = [640, 720]
 
 
@@ -26,7 +26,7 @@ class Decoder():
         # assuming binary gray code pattern
         self.bits  = (len(self.images)/2 - 1)/2
         self.patterns = self.bits * 2
-        self.curr_bit = np.int(0)
+        self.curr_bit = self.bits - 1
         self.offset = [((1 << self.bits) - PROJ[0])/2,((1 << self.bits) - PROJ[1])/2]
 
 
@@ -36,7 +36,7 @@ class Decoder():
         img1 = []
         img2 = []
         offset = self.patterns
-        start = len(self.images) - offset - 2 - 3
+        start = len(self.images) - offset - 4 - 3
         for i in xrange(0,4):
             img1.append(self.images[start + i])
             img2.append(self.images[start + i + offset])
@@ -49,17 +49,16 @@ class Decoder():
         # first two images in set are not pattern images
         images = self.images[2:]
         # the first (self.patterns) images are verticle patterns and the rest are horizontal
-
+        channel = 0
         for i in xrange(0,40):
             if (i % 2) != 0:
                 continue
             print "progress: " + str(i)
-            if i < self.patterns:
+            if i  == self.patterns:
                 # vertical
-                channel = 0
-            else:
-                # horizontal
-                channel = 1
+                channel += 1
+                self.curr_bit = self.bits - 1
+
             img1 = img_as_ubyte(io.imread(images[i], as_grey=True))
             img2 = img_as_ubyte(io.imread(images[i+1], as_grey=True))
 
@@ -84,7 +83,7 @@ class Decoder():
             out = np.apply_along_axis(self.robust_bit_est, 2, pattern_stack)
             self.decoded_indices[:, :, channel] += out
 
-            self.curr_bit += np.int(1)
+            self.curr_bit -= np.int(1)
 
         temp = self.decoded_indices[:, :, 1] + self.decoded_indices[:, :, 0]
 
@@ -131,7 +130,7 @@ class Decoder():
         ret = np.empty(self.minmax_img.shape, dtype=float)
         imgs_list = []
         for i in imgs:
-            img = img_as_ubyte(io.imread(i, as_grey=True))
+            img = img_as_ubyte(io.imread(i, as_grey=True)).astype(np.float64)
             imgs_list.append(img)
         stacked_imgs = np.stack(imgs_list, axis=2)
         min = np.amin(stacked_imgs, axis=2)
@@ -143,8 +142,8 @@ class Decoder():
         # direct <- 0 of ret
         # ambient <- 1 of ret
 
-        ret[:,:,0] = np.uint8((max - min) / (1-b))
-        ret[:,:,1] = np.uint8(2 * (min - b*max) / (1-b*b))
+        ret[:,:,0] = np.uint8((max - min) / (1.0-b))
+        ret[:,:,1] = np.uint8(2.0 * (min - b*max) / (1.0-b*1.0*b))
 
         return ret
 
