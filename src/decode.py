@@ -9,8 +9,8 @@ import code_convert
 
 
 ROOT_DIR = '/home/kevin/Desktop/learningResources/3dscan/cartman/'
-DIRECT_EST_PARAM = 0.3
-THRESH_PARAM = 7
+DIRECT_EST_PARAM = 0.27
+THRESH_PARAM = 20
 PROJ = [640, 720]
 
 
@@ -21,13 +21,15 @@ class Decoder():
         # pattern images organized in order of least to most dense and vertical -> horizontal patterns
         self.images = sorted(glob(self.views[0] + '*.png'))
         self.size = io.imread(self.images[0]).shape[0:2]
-        self.decoded_indices = np.zeros(self.size + (2,), dtype=float)
+        self.decoded_indices = np.zeros(self.size + (2,), dtype=int)
         self.minmax_img = np.zeros(self.size + (2,), dtype=int)
         # assuming binary gray code pattern
-        self.bits  = (len(self.images)/2 - 1)/2
+        self.bits = (len(self.images)/2 - 1)/2
+        self.nan_thresh = 1 << self.bits + 1
         self.patterns = self.bits * 2
         self.curr_bit = self.bits - 1
-        self.offset = [((1 << self.bits) - PROJ[0])/2,((1 << self.bits) - PROJ[1])/2]
+        self.offset = [int(((1 << self.bits) - PROJ[0])/2),int(((1 << self.bits) - PROJ[1])/2)]
+        self.proj = PROJ
 
 
     def decode(self):
@@ -36,8 +38,10 @@ class Decoder():
         img1 = []
         img2 = []
         offset = self.patterns
-        start = len(self.images) - offset - 4 - 3
+        start = len(self.images) - offset - 6 - 2
         for i in xrange(0,4):
+            print self.images[start + i + 2]
+            print self.images[start + i + offset]
             img1.append(self.images[start + i])
             img2.append(self.images[start + i + offset])
         set_imgs =  img1 + img2
@@ -81,21 +85,21 @@ class Decoder():
 
             pattern_stack = np.stack([img1, img2, direct_comps_img[:, :, 0], direct_comps_img[:, :, 1]], axis=2)
             out = np.apply_along_axis(self.robust_bit_est, 2, pattern_stack)
-            self.decoded_indices[:, :, channel] += out
+            self.decoded_indices[:, :, channel] |= out
 
-            self.curr_bit -= np.int(1)
+            self.curr_bit -= 1
 
         temp = self.decoded_indices[:, :, 1] + self.decoded_indices[:, :, 0]
 
-        temp = np.nan_to_num(temp)
+        temp[temp>=self.nan_thresh] = 0
         temp[temp>0] = 1
 
         io.imshow(temp)
         plt.show()
 
-        self.decoded_indices = code_convert.convert_pattern(self.decoded_indices, PROJ, self.offset)
+        self.decoded_indices = code_convert.convert_pattern(self.decoded_indices, PROJ, self.offset, self.nan_thresh)
 
-        temp = np.nan_to_num(self.decoded_indices)
+        temp = self.decoded_indices
 
         io.imshow(temp[:,:,0])
         plt.show()
@@ -112,22 +116,26 @@ class Decoder():
         Lg = a[3]
         m = THRESH_PARAM
         if Ld < m:
-            return np.nan
+            return self.nan_thresh
         if Ld > Lg:
             if v1 > v2:
                 return 1 << self.curr_bit
             else:
-                return 0 << self.curr_bit
-        if v1 <= Ld and v2 >= Lg:
-            return 0 << self.curr_bit
-        if v1 >= Lg and v2 <= Ld:
-            return 1 << self.curr_bit
+                return 0
+        # if v1 > v2:
+        #         return 1 << self.curr_bit
+        # else:
+        #         return 0
+        # if v1 <= Ld and v2 >= Lg:
+        #     return 0
+        # if v1 >= Lg and v2 <= Ld:
+        #     return 1 << self.curr_bit
 
-        return np.nan
+        return self.nan_thresh
 
 
     def direct_est(self, imgs, b):
-        ret = np.empty(self.minmax_img.shape, dtype=float)
+        ret = np.empty(self.minmax_img.shape, dtype=int)
         imgs_list = []
         for i in imgs:
             img = img_as_ubyte(io.imread(i, as_grey=True)).astype(np.float64)
