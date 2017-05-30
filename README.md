@@ -3,7 +3,7 @@ Structured light decoder and re-constructor
 
 given a series of structured light images and projector-camera calibration, this module will produce a 3D model of the scene 
 
-mostly academic, implemented to practice computer vision and geometry concepts for machine perception, 
+mostly academic, implemented as an exercise understand computer vision and geometry concepts for machine perception, 
 
 ## Draws heavily upon the following resources:
 
