@@ -10,7 +10,7 @@ MAX_DIST = 100.0
 class reconstruct():
     def __init__(self):
         self.decoded = Decoder()
-        self.decoded.decode();
+        self.decoded.decode()
         self.calib = Calib()
         self.minmax = self.decoded.minmax_img
         self.pattern = self.decoded.decoded_indices
@@ -25,12 +25,12 @@ class reconstruct():
 
     def reconstruct(self):
 
-        def pattern_invalid(self, pattern, minmax):
+        def pattern_invalid(thresh, pattern, minmax):
             check = pattern[0] < 0                  \
                     or pattern[0] >= self.proj[0]   \
                     or pattern[1] < 0               \
                     or pattern[1] >= self.proj[1]   \
-                    or minmax[1] - minmax[0] < self.threshold
+                    or minmax[1] - minmax[0] < thresh
             return check
 
         # create 1-to-many correspondnence between projector coordinates
@@ -38,7 +38,8 @@ class reconstruct():
         pattern = self.pattern
         minmax = self.minmax
         for i in np.ndindex(pattern.shape[:2]):
-            if pattern_invalid(pattern[i], minmax[i]):
+
+            if pattern_invalid(self.threshold, pattern[i], minmax[i]):
                 continue
             proj_point = pattern[i]
             index = proj_point[1]*self.out_cols + proj_point[0]
@@ -48,6 +49,7 @@ class reconstruct():
         # find average of the many camera coordinates
         # for each projector coordinate
         for key in self.proj_points.keys():
+
             proj_point = self.proj_points[key]
             cam_points = self.cam_points[key]
             count = len(cam_points)
@@ -55,8 +57,8 @@ class reconstruct():
             x = 0
             y = 0
             for point in cam_points:
-                y += cam_points[0]
-                x += cam_points[1]
+                y += point[0]
+                x += point[1]
             y /= count
             x /= count
             cam = (x,y)
@@ -65,7 +67,9 @@ class reconstruct():
             p, dist = self.triangulate_stereo(cam,proj)
 
             if dist < self.max_dist:
-                self.pointcloud[(proj[1], proj[0])] = p
+                self.pointcloud[(proj[1], proj[0])] = np.asarray(p).flatten()
+
+        print "done"
 
 
     def triangulate_stereo(self, p1, p2):

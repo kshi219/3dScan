@@ -9,7 +9,7 @@ import code_convert
 
 
 ROOT_DIR = '/home/kevin/Desktop/learningResources/3dscan/cartman/'
-DIRECT_EST_PARAM = 0.5
+DIRECT_EST_PARAM = 0.3
 THRESH_PARAM = 5
 PROJ = [640, 720]
 
@@ -17,6 +17,7 @@ PROJ = [640, 720]
 class Decoder():
 
     def __init__(self, image_dir=ROOT_DIR):
+        print DIRECT_EST_PARAM
         self.views = glob(image_dir + '*/')
         # pattern images organized in order of least to most dense and vertical -> horizontal patterns
         self.images = sorted(glob(self.views[0] + '*.png'))
