@@ -9,14 +9,14 @@ import code_convert
 
 
 ROOT_DIR = '/home/kevin/Desktop/learningResources/3dscan/cartman/'
-DIRECT_EST_PARAM = 0.27
-THRESH_PARAM = 20
+DIRECT_EST_PARAM = 0.5
+THRESH_PARAM = 5
 PROJ = [640, 720]
 
 
 class Decoder():
 
-    def __init__(self, image_dir):
+    def __init__(self, image_dir=ROOT_DIR):
         self.views = glob(image_dir + '*/')
         # pattern images organized in order of least to most dense and vertical -> horizontal patterns
         self.images = sorted(glob(self.views[0] + '*.png'))
@@ -88,24 +88,24 @@ class Decoder():
             self.decoded_indices[:, :, channel] |= out
 
             self.curr_bit -= 1
-
-        temp = self.decoded_indices[:, :, 1] + self.decoded_indices[:, :, 0]
-
-        temp[temp>=self.nan_thresh] = 0
-        temp[temp>0] = 1
-
-        io.imshow(temp)
-        plt.show()
+        #
+        # temp = self.decoded_indices[:, :, 1] + self.decoded_indices[:, :, 0]
+        #
+        # temp[temp>=self.nan_thresh] = 0
+        # temp[temp>0] = 1
+        #
+        # io.imshow(temp)
+        # plt.show()
 
         self.decoded_indices = code_convert.convert_pattern(self.decoded_indices, PROJ, self.offset, self.nan_thresh)
 
-        temp = self.decoded_indices
-
-        io.imshow(temp[:,:,0])
-        plt.show()
-
-        io.imshow(temp[:,:,1])
-        plt.show()
+        # temp = self.decoded_indices
+        #
+        # io.imshow(temp[:,:,0])
+        # plt.show()
+        #
+        # io.imshow(temp[:,:,1])
+        # plt.show()
 
 
 
@@ -157,5 +157,5 @@ class Decoder():
 
 
 
-d =  Decoder(ROOT_DIR)
-d.decode()
+# d =  Decoder(ROOT_DIR)
+# d.decode()

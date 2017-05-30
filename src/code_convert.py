@@ -26,7 +26,7 @@ def convert_pattern(pattern_img, proj_size, offset, thresh):
                 if code >= proj_size[1]: code = proj_size[1] - 1
                 pattern_img[r, c, 0] = code
             else:
-                pattern_img[r, c, 0] = 0
+                pattern_img[r, c, 0] = -1
 
 
             if pattern[1] < thresh:
@@ -35,7 +35,7 @@ def convert_pattern(pattern_img, proj_size, offset, thresh):
                 if code >= proj_size[0]: code = proj_size[0] - 1
                 pattern_img[r, c, 1] = code
             else:
-                pattern_img[r, c, 1] = 0
+                pattern_img[r, c, 1] = -1
 
     return pattern_img
 

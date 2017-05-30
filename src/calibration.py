@@ -11,6 +11,7 @@ class Calib():
         stream = file(self.file, 'r')
         calib_vars_dict = yaml.load(stream)
         self.R = self.raw2arr(calib_vars_dict, 'R')
+        self.Rt = np.transpose(self.R)
         self.T = self.raw2arr(calib_vars_dict, 'T')
         self.cam_K = self.raw2arr(calib_vars_dict, 'cam_K')
         self.cam_Kc = self.raw2arr(calib_vars_dict, 'cam_kc')
