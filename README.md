@@ -1,7 +1,7 @@
 # 3dScan
 Structured light decoder and re-constructor. "From Images to 3D Model"
 
-Given a series of structured light images and projector-camera calibration, this module will produce a 3D model of the scene. Purely academic motivations/goals, implemented as to exercise computer vision and geometry concepts for machine perception after groking through some online course materials and scientific papers. Using python and numpy the code was able to express concisely the mathematics of point-cloud reconstruction from structured light images. No computer vision libraries (openCV, PIL, VTK etc) were used. Input structured-light images and calibration software were found [here](http://mesh.brown.edu/scanning/). 
+Given a series of structured light images (images with special light projected on them, like the one below) and projector-camera calibration, this module will produce a 3D model of the scene. Purely academic motivations/goals, implemented as to exercise computer vision and geometry concepts for machine perception after groking through some online course materials and scientific papers. Using python and numpy the code was able to express concisely the mathematics of point-cloud reconstruction from structured light images. No computer vision libraries (openCV, PIL, VTK etc) were used. Input structured-light images and calibration software were found [here](http://mesh.brown.edu/scanning/). 
 
 Here is a sample image: 
 <img src="https://github.com/kshi219/3dScan/blob/master/gifs/cam_16.png">
