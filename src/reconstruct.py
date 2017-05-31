@@ -69,6 +69,7 @@ class reconstruct():
             if dist < self.max_dist:
                 self.pointcloud[(proj[1], proj[0])] = np.asarray(p).flatten()
 
+        np.save('cloud.npy', self.pointcloud)
         print "done"
 
 
@@ -125,7 +126,9 @@ class reconstruct():
 
 
 
-
+if __name__ == '__main__':
+    recon = reconstruct()
+    recon.reconstruct()
 
 
 
