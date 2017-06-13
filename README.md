@@ -11,7 +11,7 @@ Given a series of structured light images (images with special light projected o
 This code is only concerned with reconstruction. The 2 gifs above display the resulting pointcloud next to a rotation of the scanned object. We can see a good representation of the relative depth and form of the firgure's arms, head, torso and bottom platform. Note that we only are able to discern accurate depth information for frontal regions of the figure which were consistently illuminated by the structured light. A side-on view of the point cloud's profile matches that of the actual figure.
 
 
-## Ongoing work:
+## Further Work:
 ### Speed: 
 this runs painfully slow, I tried not to think about speed the first time around and focus on understanding the math as I implemented, this should be improved.
 
